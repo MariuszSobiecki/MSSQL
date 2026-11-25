@@ -14,9 +14,9 @@ USE [SSISDB];
 GO
 
 -- Manually register your named instance into the SSIS tracking configuration
-IF NOT EXISTS (SELECT 1 FROM [catalog].[alwayson_replicas] WHERE [server_name] = N'PLSQL1QANOD02\INSTANCE_1')
+IF NOT EXISTS (SELECT 1 FROM [catalog].[alwayson_replicas] WHERE [server_name] = N'PrimaryReplica')
 BEGIN
     INSERT INTO [catalog].[alwayson_replicas] ([server_name])
-    VALUES (N'PLSQL1QANOD02\INSTANCE_1');
+    VALUES (N'SecondaryReplica');
 END
 GO
