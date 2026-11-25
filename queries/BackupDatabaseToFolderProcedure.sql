@@ -1,11 +1,11 @@
 CREATE PROCEDURE dbo.BackupDatabaseToFolder
     @DatabaseName NVARCHAR(128),
     @BackupFolder NVARCHAR(260),
-    @ExpireDays INT = NULL -- after how many days backup can be deleted. NULL by default.
-	--example
-	--EXEC dbo.BackupDatabaseToFolder 
-    --@DatabaseName = 'YourDatabaseName', 
-    --@BackupFolder = 'C:\SQLBackups';
+    @ExpireDays INT = NULL -- New parameter: number of days after which the backup is deleted. NULL means no deletion.
+	-- Example:
+	-- EXEC dbo.BackupDatabaseToFolder 
+    -- @DatabaseName = 'YourDatabaseName', 
+    -- @BackupFolder = 'C:\SQLBackups';
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -51,14 +51,14 @@ BEGIN
 
         PRINT 'Backup successfully created at: ' + @BackupPath;
 
-        -- --- KROK USUWANIA STARYCH BACKUPOW ---
+        -- --- OLD BACKUP CLEANUP STEP ---
         IF @ExpireDays IS NOT NULL AND @ExpireDays > 0
         BEGIN
             DECLARE @DeleteCutoffDate DATETIME;
-            -- Obliczenie daty granicznej
+            -- Calculate the cutoff date
             SET @DeleteCutoffDate = DATEADD(day, -@ExpireDays, GETDATE());
 
-            -- xp_delete_file wymaga: typu pliku (0=backup, 1=log), ścieżki, rozszerzenia, daty oraz flagi podfolderów (0=nie)
+            -- xp_delete_file requires: file type (0=backup, 1=log), path, extension, date, and subfolder flag (0=no)
             EXEC master.dbo.xp_delete_file 
                 0, 
                 @BackupFolder, 
@@ -66,7 +66,7 @@ BEGIN
                 @DeleteCutoffDate, 
                 0;
 
-            PRINT 'Zakończono proces usuwania backupów starszych niż ' + CAST(@ExpireDays AS NVARCHAR(10)) + ' dni.';
+            PRINT 'Finished deleting backups older than ' + CAST(@ExpireDays AS NVARCHAR(10)) + ' days.';
         END
     END TRY
     BEGIN CATCH
