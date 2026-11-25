@@ -1,7 +1,7 @@
 CREATE PROCEDURE dbo.BackupDatabaseToFolder
     @DatabaseName NVARCHAR(128),
     @BackupFolder NVARCHAR(260),
-    @ExpireDays INT = NULL -- Nowy parametr: ilość dni, po których backup jest usuwany. NULL oznacza brak usuwania.
+    @ExpireDays INT = NULL -- after how many days backup can be deleted. NULL by default.
 	--example
 	--EXEC dbo.BackupDatabaseToFolder 
     --@DatabaseName = 'YourDatabaseName', 
