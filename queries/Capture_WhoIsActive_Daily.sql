@@ -1,4 +1,6 @@
-USE [Unum_DBA]
+-- Install Adam Machanic script
+--https://github.com/amachanic/sp_whoisactive/blob/master/sp_WhoIsActive.sql
+USE [DBA] --type your DBA database
 GO
 /****** Object:  StoredProcedure [dbo].[Capture_WhoIsActive_Daily]    Script Date: 30.06.2026 10:16:53 ******/
 SET ANSI_NULLS ON
