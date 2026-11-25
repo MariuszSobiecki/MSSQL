@@ -1,3 +1,6 @@
+USE [YourDatabase];
+GO
+
 SELECT 
     s.name AS [Schema],
     t.name AS [TableName],
@@ -23,8 +26,17 @@ INNER JOIN
     sys.allocation_units a ON p.partition_id = a.container_id
 WHERE 
     t.is_ms_shipped = 0
-    AND i.type IN (0, 1) -- 0: Heap, 1: Clustered Rowstore (exclude tables that are already Columnstore)
+    AND i.type IN (0, 1) -- Heap (0) and Clustered Rowstore (1) only
+    AND NOT EXISTS (
+        -- Exclude tables that already have any Columnstore index (5 = Clustered, 6 = Nonclustered)
+        SELECT 1 
+        FROM sys.indexes ci 
+        WHERE ci.object_id = t.object_id 
+          AND ci.type IN (5, 6)
+    )
 GROUP BY 
     s.name, t.name
+HAVING 
+    SUM(p.rows) >= 1048576 -- Show only tables with at least 1M rows (technical minimum for 1 full rowgroup)
 ORDER BY 
     [TotalRows] DESC;
